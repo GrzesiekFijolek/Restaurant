@@ -1,0 +1,280 @@
+﻿@model Zadanie2.DTOs.MultiView
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="container">
+        @using (@Html.BeginForm("AddMultiOrder", "Home", FormMethod.Post, new { @class = "row"}))
+        {
+            for (int i = 0; i < Model.Tables.Count(); i++)
+            {
+                <div class="col-md-4 p-2">
+
+                    @Html.CheckBoxFor(m => Model.Tables[i].IsChoosen, new { @class = "checkbox"})
+                    <span class="text-uppercase table-names p-4">@Model.Tables[i].Name</span>
+                </div>
+            }
+
+
+
+<div class="row">
+
+    <div class="col-sm-12 text-right">
+        <button type="reset" class="btn btn-warning btn-lg mb-2">Anuluj</button>
+        <button type="submit" class="btn btn-dark btn-lg mb-2" id="confirm">Potwierdź</button>
+    </div>
+
+    @for (int i = 0; i < Model.Dishes.Count(); i++)
+    {
+        <div class="col-md-3 mb-4">
+            <div class="card">
+                <img class="card-img-top" src="@Model.Dishes[i].Source" alt="@Model.Dishes[i].Name" />
+                <h5 class="card-title p-1">@Model.Dishes[i].Name</h5>
+
+                <div class="d-flex p-2">
+                    <p class="d-flex justify-content-start w-50">Cena:</p>
+                    <p class="d-flex justify-content-end w-50" id="@setPriceId(Model.Dishes[i].Name)">@setPrice(Model.Dishes[i].Price)</p>
+                </div>
+                <div class="d-flex p-2">
+                    <p class="d-flex justify-content-start w-50">W sumie:</p>
+                    <p class="d-flex justify-content-end w-50 total" id="@setTotalId(Model.Dishes[i].Name)">@setTotal(Model.Dishes[i].Price, Model.Dishes[i].Quantity)</p>
+                </div>
+
+                <div class="input-group p-1 text-center">
+
+                    <button id="@setRemoveId(Model.Dishes[i].Name)" class="btn btn-danger w-25" type="button">Usuń</button>
+                    @Html.TextBoxFor(m => Model.Dishes[i].Quantity, new
+                    {
+                        @class = "form-control mx-4 text-center font-weight-bold",
+                        @id = @setQuantityId(Model.Dishes[i].Name),
+                        onkeypress = "return isNumber(event)",
+                        onpaste = "return false;"
+                    })
+                    <button id="@setAddId(Model.Dishes[i].Name)" class="btn btn-success w-25" type="button">Dodaj</button>
+
+                </div>
+            </div>
+        </div>
+        @Html.HiddenFor(m => Model.Dishes[i].Name)
+        @Html.HiddenFor(m => Model.Dishes[i].Price)
+        @Html.HiddenFor(m => Model.Dishes[i].Source)
+    }
+</div>
+    }
+</div>
+    
+
+@functions {
+    public string setAddId(string dishName)
+    {
+        string Id = dishName + "Add";
+        return Id;
+    }
+
+    public string setRemoveId(string dishName)
+    {
+        string Id = dishName + "Remove";
+        return Id;
+    }
+
+    public string setQuantityId(string dishName)
+    {
+        string Id = dishName + "Quantity";
+        return Id;
+    }
+
+    public string setPriceId(string dishName)
+    {
+        string Id = dishName + "Price";
+        return Id;
+    }
+
+    public string setTotalId(string dishName)
+    {
+        string Id = dishName + "Total";
+        return Id;
+    }
+
+    public string setTotal(double price, int quantity)
+    {
+        double x = Math.Round(price * quantity, 2);
+
+        return x.ToString();
+    }
+
+    public string setPrice(double price)
+    {
+        string formattedPrice = string.Format("{0:N2}", price);
+
+        return formattedPrice;
+    }
+
+}
+
+
+
+
+@section Scripts{
+
+    <script type="text/javascript">
+
+        $(".btn-success").click(function (event) {
+            var dishName = event.target.id.split("A");
+            var inputId = dishName[0].concat("Quantity");
+            var actual = parseInt($("#" + inputId).val());
+            if (actual < 20) {
+                $("#" + inputId).val(actual + 1);
+                $("#" + dishName[0] + "Remove").removeClass('disabled');
+            }
+            else {
+                $("#" + dishName[0] + "Add").addClass('disabled');
+            }
+
+            setTotalPrice(dishName[0]);
+        });
+
+         $(".btn-danger").click(function (event) {
+            var dishName = event.target.id.split("R");
+            var inputId = dishName[0].concat("Quantity");
+            var actual = parseInt($("#" + inputId).val());
+             if (actual > 0) {
+                 $("#" + inputId).val(actual - 1);
+                 $("#" + dishName[0] + "Add").removeClass('disabled');
+             }
+             else {
+                $("#" + dishName[0] + "Remove").addClass('disabled');
+             }
+
+             setTotalPrice(dishName[0]);
+         });
+
+        $(document).ready(function () {
+            $('.btn-danger').each(function () {
+                var id = $(this).attr('id');
+                var temp = id.split("R");
+                var textBoxId = temp[0].concat("Quantity");
+                if (parseInt($("#" + textBoxId).val()) == 0)
+                    $(this).addClass('disabled');
+            });
+
+
+            $('.total').each(function () {
+                var id = $(this).attr('id');
+                var dishName = id.split("T");
+                setTotalPrice(dishName[0]);
+            });
+        });
+
+
+        $('.checkbox').click(function () {
+            var flag = false;
+                $('.checkbox').each(function () {
+                    if ($(this).is(':checked')) {
+                        var sum = 0;
+                        flag = true;
+                        $('.total').each(function () {
+                            var x = parseFloat($(this).text());
+                            sum = sum + x;
+                        });
+                        if (sum == 0) {
+                            $('#confirm').addClass('disabled');
+                            $('#confirm').attr("disabled", true);
+                        }
+                        else {
+                            $('#confirm').removeClass('disabled');
+                            $('#confirm').attr("disabled", false);
+                        }
+                    }
+                   
+                });
+                if (!flag) {
+                    $('#confirm').addClass('disabled');
+                    $('#confirm').attr("disabled", true);
+                    }
+            });
+
+        $('.form-control').focusin(function () {
+            oldValue = $(this).val();
+        });
+
+        $('.form-control').change(function () {
+            var min = 0;
+            var max = 20;
+            var currentValue = parseInt($(this).val());
+            if (currentValue > max || currentValue < min) {
+                $(this).val(max);
+            }
+            else {
+                var id = $(this).attr('id');
+                var temp = id.split("Q");
+                var dangerButton = temp[0].concat("Remove");
+                if (currentValue == 0) {
+                    $("#" + dangerButton).addClass('disabled');
+                }
+                else {
+                    $("#" + dangerButton).removeClass('disabled');
+                }
+            }
+
+            var dishName = event.target.id.split("Q");
+            setTotalPrice(dishName[0]);
+        });
+
+        function setTotalPrice(dishName) {
+            var priceId = "#".concat(dishName.concat("Price"));
+            var totalId = "#".concat(dishName.concat("Total"));
+            var quantityId = "#".concat(dishName.concat("Quantity"));
+            var price = $(priceId).text();
+            var quantity = $(quantityId).val();
+
+            $.post('@Url.Action("SetTotal", "Home")', { price: price, quantity: quantity }, function (response) {
+                $(totalId).text(parseFloat(response).toFixed(2));
+                checkPrices();
+            });
+
+        };
+
+        function checkPrices() {
+            var flag = false;
+            $('.checkbox').each(function () {
+                if ($(this).is(':checked')) {
+                    var sum = 0;
+                    flag = true;
+                     
+                    $('.total').each(function () {
+                        var x = parseFloat($(this).text());
+                        sum = sum + x;
+                    });
+                    console.log(sum);
+                    if (sum == 0) {
+                        $('#confirm').addClass('disabled');
+                        $('#confirm').attr("disabled", true);
+                    }
+                    else {
+                        $('#confirm').removeClass('disabled');
+                        $('#confirm').attr("disabled", false);
+                    }
+                }
+                   
+            });
+            if (!flag) {
+                $('#confirm').addClass('disabled');
+                $('#confirm').attr("disabled", true);
+                }
+        }
+
+        function isNumber(evt) {
+        evt = (evt) ? evt : window.event;
+        var charCode = (evt.which) ? evt.which : evt.keyCode;
+        if ( (charCode > 31 && charCode < 48) || charCode > 57) {
+            return false;
+        }
+        return true;
+        }
+    </script>
+
+}
+
+
+
+

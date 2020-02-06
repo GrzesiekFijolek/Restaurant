@@ -1,0 +1,50 @@
+﻿@model List<Zadanie2.Models.Table>
+
+@{
+    ViewBag.Title = "Lista stolików";
+}
+
+    
+    <div class="container">
+        <div class="row">
+            <div class="col-md-8 offset-2">
+                <h2 class="p-3">Lista wszystkich stolików</h2>
+                <table class="table">
+                    <thead class="thead-dark">
+                        <tr>
+                            <th scope="col">Nazwa stolika</th>
+                            <th scope="col">Status</th>
+                            <th scope="col"></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var table in Model)
+                        {
+                            <tr>
+                                <th scope="row">@table.Name</th>
+                                <td class="isOccupied">@table.IsOccupied</td>
+                                <td class="text-right">
+                                     @Html.ActionLink("Szczegóły", "Table", new { table.Id }, new { @class = "btn btn-info px-4", type="button"})
+                                 </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+@section Scripts {
+    <script type="text/javascript">
+
+        $(document).ready(function () {
+            $('.isOccupied').each(function () {
+                if ($(this).text() === "wolny") $(this).addClass('text-success');
+                else $(this).addClass('text-warning');
+            })
+
+        });
+    </script>
+    
+    }
+      

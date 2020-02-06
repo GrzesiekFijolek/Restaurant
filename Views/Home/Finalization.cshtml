@@ -1,0 +1,39 @@
+﻿@model Zadanie2.DTOs.Order
+
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="container">
+    <div class="col-md-8 offset-2">
+        <table class="table">
+            <tbody>
+                <tr>
+                    <td>Do zapłaty:</td>
+                    <td class="price">@Model.TotalPrice</td>
+                </tr>
+                <tr>
+                    <td>Napiwek 5%:</td>
+                    <td class="price">@Model.Tip</td>
+                </tr>
+                <tr>
+                    <td>z napiwkiem:</td>
+                    <td class="price">@Model.PriceWithTip</td>
+                </tr>
+            </tbody>
+        </table>
+
+        @Html.ActionLink("Zapłać (+ napiwek)", "RemoveOrder", new { table = Model.TableId, redirect = "GetAllOrders" }, new { @class = "btn btn-dark mx-3", type = "button" })
+    </div>
+</div>
+
+
+@section Scripts {
+    <script type="text/javascript">
+        $('.price').each(function () {
+            var x = $(this).text();
+            var float = parseFloat(x).toFixed(2);
+            $(this).text(float);
+        });
+    </script>
+}

@@ -1,0 +1,78 @@
+﻿@model Zadanie2.DTOs.Order
+
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    ViewBag.Title = "Stolik nr" + this.Model.TableId;
+}
+
+    <div class="container">
+
+        <div class="row">
+            <div class="col-md-8 offset-2">
+                <h4>Szczegóły zamówienia dla Stolika numer @Model.TableId</h4>
+                @if (Model.Dishes.Count < 1)
+                {
+                    <div class="d-flex justify-content-center m-3">
+                        @Html.ActionLink("Dodaj zamówienie", "DishesList", new { table = Model.TableId, method = "AddOrder" }, new { @class = "btn btn-dark", type = "button" })
+                    </div>
+                }
+                else
+                {
+                    using (Html.BeginForm("Finalization", "Home", FormMethod.Post))
+                    {
+                        <table class="table">
+                            <thead class="thead-dark">
+                                <tr>
+                                    <th scope="col">Nazwa dania</th>
+                                    <th scope="col">Cena jednostkowa</th>
+                                    <th scope="col">Ilość</th>
+                                    <th scope="col">Cena</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @for (int i = 0; i < Model.Dishes.Count; i++)
+                                {
+
+
+                                    if (Model.Dishes[i].Quantity != 0)
+                                    {
+                                        <tr class="p-1">
+                                            <th scope="row">@Model.Dishes[i].Name</th>
+                                            <td class="price">@Model.Dishes[i].Price</td>
+                                            <td>@Model.Dishes[i].Quantity</td>
+                                            <td class="price">@Model.Dishes[i].TotalPrice</td>
+                                        </tr>
+                                    }
+                                }
+
+                                @Html.HiddenFor(m => Model.TotalPrice)
+                                @Html.HiddenFor(M => Model.TableId)
+                                @Html.HiddenFor(m => Model.PriceWithTip)
+                            </tbody>
+                        </table>
+                        <div class="d-flex justify-content-center">
+                            @Html.ActionLink("Usuń", "RemoveOrder", new { table = Model.TableId, redirect = "Table" }, new { @class = "btn btn-danger mx-3", type = "button" })
+                            @Html.ActionLink("Modyfikuj", "DishesList", new { table = Model.TableId, method = "ModifyOrder", reddirect = "Table" }, new { @class = "btn btn-info mx-3", type = "button" })
+                            <button class="btn btn-secondary mx-3" type="submit">Zapłać</button>
+
+                        </div>
+                    }
+
+                }
+
+            </div>
+        </div>
+
+    </div>
+
+@section Scripts {
+    <script type="text/javascript">
+        $('.price').each(function () {
+            var x = $(this).text();
+            var float = parseFloat(x).toFixed(2);
+            $(this).text(float);
+        });
+    </script>
+    }
+
+

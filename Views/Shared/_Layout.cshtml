@@ -1,0 +1,36 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>@ViewBag.Title - My ASP.NET Application</title>
+    @Styles.Render("~/Content/css")
+    @Scripts.Render("~/bundles/modernizr")
+</head>
+<body>
+    
+    <div class="container">
+        <h1 class="pb-2 pt-1 text-center">Obsługa restauracji</h1>
+
+        <div class="row m-2 border-bottom border-secondary">
+            <div class="col-md-8 offset-2">
+                <nav class="nav nav-pills nav-fill m-2">
+                    @Html.ActionLink("Lista stolików", "TablesList", null, new { @class = "nav-item nav-link" })
+                    @Html.ActionLink("Wszystkie Zamówienia", "GetAllOrders", null, new { @class = "nav-item nav-link" })
+                    @Html.ActionLink("Zamówienie grupowe", "MultiOrder", null, new { @class = "nav-item nav-link" })
+                </nav>
+            </div>
+        </div>
+
+        <div class="row">
+            @RenderBody()
+        </div>
+    </div>
+
+    
+
+    @Scripts.Render("~/bundles/jquery")
+    @Scripts.Render("~/bundles/bootstrap")
+    @RenderSection("scripts", required: false)
+</body>
+</html>

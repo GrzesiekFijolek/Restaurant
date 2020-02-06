@@ -1,0 +1,67 @@
+﻿@model List<Zadanie2.DTOs.Order>
+
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="container">
+    <div class="row">
+        <div class="col-md-8 offset-2">
+            <h3 class="p-3">Wszystkie zamówienia</h3>
+
+            @for (int i = 0; i < Model.Count(); i++)
+            {
+                using (Html.BeginForm("FinalizationFromAllOrders", "Home", new { total = Model[i].TotalPrice, id = Model[i].TableId }, FormMethod.Post))
+                {
+                    <h5 class="text-center pt-3">Stolik nr @Model[i].TableId</h5>
+                    <table class="table">
+                        <thead class="thead-dark">
+                            <tr>
+                                <th scope="col">Nazwa dania</th>
+                                <th scope="col">Cena jednostkowa</th>
+                                <th scope="col">Ilość</th>
+                                <th scope="col">Cena</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @for (int j = 0; j < Model[i].Dishes.Count; j++)
+                            {
+                                if (Model[i].Dishes[j].Quantity != 0)
+                                {
+                                    <tr class="p-1">
+                                        <th scope="row">@Model[i].Dishes[j].Name</th>
+                                        <td class="price">@Model[i].Dishes[j].Price</td>
+                                        <td>@Model[i].Dishes[j].Quantity</td>
+                                        <td class="price">@Model[i].Dishes[j].TotalPrice</td>
+                                    </tr>
+                                }
+                                @Html.HiddenFor(m => Model[i].TotalPrice)
+                                @Html.HiddenFor(M => Model[i].TableId)
+                                @Html.HiddenFor(m => Model[i].PriceWithTip)
+
+                            }
+
+                        </tbody>
+                    </table>
+                    <div class="d-flex justify-content-end mb-4">
+                        @Html.ActionLink("Usuń", "RemoveOrder", new { table = Model[i].TableId, redirect = "GetAllOrders" }, new { @class = "btn btn-danger mx-3", type = "button" })
+                        @Html.ActionLink("Modyfikuj", "DishesList", new { table = Model[i].TableId, method = "ModifyOrder", redirect = "GetAllOrders" }, new { @class = "btn btn-info mx-3", type = "button" })
+                        <button class="btn btn-secondary mx-3" type="submit">Zapłać</button>
+                    </div>
+                }
+
+            }
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script type="text/javascript">
+        $('.price').each(function () {
+            var x = $(this).text();
+            var float = parseFloat(x).toFixed(2);
+            $(this).text(float);
+        });
+    </script>
+}
+
